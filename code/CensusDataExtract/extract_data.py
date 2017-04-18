@@ -10,6 +10,7 @@ def get_census_data(lat, long, year='2010'):
     Returns census data for a given coordinate (lat, long).
     :param lat: Latitude of point
     :param long: Longitude of point
+    :param year: Year of the Decennial census. Default is 2010.
     :return: Census data for given point as a dict where key is the census data type and the value is the value of the 
     data.
     """
