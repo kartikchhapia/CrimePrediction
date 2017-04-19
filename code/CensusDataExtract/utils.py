@@ -2,6 +2,7 @@ import json
 import requests
 from config import CENSUS_BLOCK_CONV_URL
 
+
 def get_geo_id(lat, long):
     """
     Returns the GEO_ID aka FIPS code of the point given by a latitude and longitude.
@@ -11,6 +12,7 @@ def get_geo_id(lat, long):
     """
     res = requests.get(CENSUS_BLOCK_CONV_URL.format(lat, long))
     return res.json()['Block']['FIPS']
+
 
 def jsonp_res_to_obj(jsonp_res):
     """
