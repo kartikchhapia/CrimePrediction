@@ -11,7 +11,7 @@ def get_geo_id(lat, long):
     :return: FIPS code or GEO_ID of the point
     """
     res = requests.get(CENSUS_BLOCK_CONV_URL.format(lat, long))
-    return res.json()['Block']['FIPS']
+    return res.json()['Block']['FIPS'][:11]
 
 
 def jsonp_res_to_obj(jsonp_res):
@@ -24,3 +24,22 @@ def jsonp_res_to_obj(jsonp_res):
     json_str = jsonp_res[open_parens_idx + 1: -1]
     json_obj = json.loads(json_str)
     return json_obj
+
+
+def cols_config_to_csv_tables(cols_config):
+    """
+    Converts a config object for columns to a comma separated string of tables.
+    :param cols_config: Config object for a single column. (See config.py)
+    :return: Comma separated string of tables
+    """
+    tables = [v[0] for k, v in cols_config.items()]
+    return ','.join(tables)
+
+
+def geo_id_to_cenrep_geo_id(geo_id):
+    """
+    Converts a normal GEO_ID to a format that works with the census reporter API.
+    :param geo_id: A valid GEO_ID (FIPS)
+    :return: GEO_ID in a format supported by census reporter API
+    """
+    return '14000US{}'.format(geo_id)

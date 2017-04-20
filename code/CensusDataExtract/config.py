@@ -5,6 +5,9 @@ CENSUS_BLOCK_CONV_URL = 'http://data.fcc.gov/api/block/2010/find?latitude={}&lon
 POINT_QUERY_URL = 'http://census.ire.org/geo/1.0/boundary/?contains={},{}&sets=tracts'
 CENSUS_QUERY_URL = 'http://censusdata.ire.org/{}/{}.jsonp'
 
+# table_ids and geo_ids are comma separated
+ACS_QUERY_URL = 'https://api.censusreporter.org/1.0/data/show/acs2015_5yr?table_ids={}&geo_ids=14000US{}'
+
 DECENNIAL_COLS = {
     'total_population': ['P1', 'P001001'],  # Total population
     'race_white': ['P3', 'P003002'],  # Race: White Alone
@@ -74,3 +77,6 @@ DECENNIAL_COLS = {
     'renter_occupied': ['H4', 'H004004']
 }
 
+ACS_COLS= {
+    'median_inc': ['B06011', 'B06011001']
+}
