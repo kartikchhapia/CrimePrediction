@@ -77,6 +77,15 @@ DECENNIAL_COLS = {
     'renter_occupied': ['H4', 'H004004']
 }
 
+#TODO:
+# Education
 ACS_COLS= {
-    'median_inc': ['B06011', 'B06011001']
+    'median_income': ['B06011', 'B06011001'],
+    'gini_income_inequality': ['B19083', 'B19083001'],
+    "in_labor_force": ["B23025", "B23025002"],
+    "civilian_labor_force": ["B23025", "B23025003"],
+    "employed": ["B23025", "B23025004"],
+    "unemployed": ["B23025", "B23025005"],
+    "armed_forces": ["B23025", "B23025006"],
+    "not_in_labor_force": ["B23025", "B23025007"]
 }
