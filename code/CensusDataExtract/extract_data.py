@@ -41,4 +41,3 @@ if __name__ == '__main__':
         time.sleep(THROTTLE)
         data = get_census_data(lat, long)
         print data
-        break
