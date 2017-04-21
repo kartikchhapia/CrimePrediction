@@ -1,6 +1,6 @@
 import json
 import requests
-from config import CENSUS_BLOCK_CONV_URL
+from config import CENSUS_BLOCK_CONV_URL, COUNTY_CODES
 
 
 def get_geo_id(lat, long):
@@ -43,3 +43,14 @@ def geo_id_to_cenrep_geo_id(geo_id):
     :return: GEO_ID in a format supported by census reporter API
     """
     return '14000US{}'.format(geo_id)
+
+
+def is_inside_county(lat, long, counties=COUNTY_CODES):
+    geo_id = get_geo_id(lat, long)
+    county_id = str(geo_id[2:5])
+    is_inside = False
+    for k, v in counties.items():
+        if v == county_id:
+            is_inside = True
+            break
+    return is_inside

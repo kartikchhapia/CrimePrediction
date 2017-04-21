@@ -1,12 +1,22 @@
 # Wait this amount in seconds before each request
 THROTTLE = 0.4
 
+# Manhattan, Bronx, Brooklyn, Queens, Richmond county
+
 CENSUS_BLOCK_CONV_URL = 'http://data.fcc.gov/api/block/2010/find?latitude={}&longitude={}&format=json'
 POINT_QUERY_URL = 'http://census.ire.org/geo/1.0/boundary/?contains={},{}&sets=tracts'
 CENSUS_QUERY_URL = 'http://censusdata.ire.org/{}/{}.jsonp'
 
-# table_ids and geo_ids are comma separated
+# Table_ids and geo_ids are comma separated
 ACS_QUERY_URL = 'https://api.censusreporter.org/1.0/data/show/acs2015_5yr?table_ids={}&geo_ids=14000US{}'
+
+COUNTY_CODES = {
+    'new_york': '061',
+    'richmond': '085',
+    'bronx': '005',
+    'kings': '047',
+    'queens': '081'
+}
 
 DECENNIAL_COLS = {
     'total_population': ['P1', 'P001001'],  # Total population
