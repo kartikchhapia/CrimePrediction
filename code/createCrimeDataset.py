@@ -142,6 +142,7 @@ def calculateDistance(lat1, lon1, crimedata, crimedataLatLonList):
          if distanceBetweenPoints < distanceProximity:
              latlonstring = "(" + lat2+","+lon2+")"
              indexList =  crimedata.Lat_Lon[crimedata.Lat_Lon == latlonstring].index.tolist()
+             print "indexListy is ", indexList
              
              #print "CLOSE ", lat1, lon1, lat2, lon2
              for i in indexList:
@@ -163,7 +164,70 @@ def calculateDistance(lat1, lon1, crimedata, crimedataLatLonList):
      latList.append          (lat1)
      lonList.append          (lon1)
 
-     print "Crime Counts are ", violationCount, misdemeanorCount, felonyCount
+     print "Crime Counts old function is ", violationCount, misdemeanorCount, felonyCount
+         
+
+def calculateDistanceNew(lat1, lon1, crimedata, crimedataLatLonList):
+
+     felonyCount = 0
+     misdemeanorCount = 0
+     violationCount = 0
+     latLonStringList = list()
+
+     for i, lat_lon in enumerate(crimedataLatLonList):
+         
+         lat2, lon2 = getLatLonFromString(lat_lon)
+     
+
+         latlon1 = str(lat1) + "," + str(lon1)
+         lat2 = str(lat2)
+         lon2 = str(lon2)
+         latlontuple1 = (lat1, lon1)
+         latlontuple2 = (lat2, lon2)
+
+         #print "l1, l2 is ", latlontuple1, latlontuple2
+         
+         distanceBetweenPoints = (great_circle(latlontuple1, latlontuple2).meters)
+         #print "Distance is ", distanceBetweenPoints , " between coordinates ", lat1, lon1, lat2, lon2
+         #print "For point", i, "Distance is ", distanceBetweenPoints
+         if distanceBetweenPoints < distanceProximity:
+             latlonstring = "(" + lat2+","+lon2+")"
+             latLonStringList.append(latlonstring)
+             """
+             indexList =  crimedata.Lat_Lon[crimedata.Lat_Lon == latlonstring].index.tolist()
+             
+             #print "CLOSE ", lat1, lon1, lat2, lon2
+             for i in indexList:
+                 if crimedata.at[i,'LAW_CAT_CD'] == "FELONY":
+                     felonyCount        =  felonyCount         + 1
+
+                 elif crimedata.at[i,'LAW_CAT_CD'] == "MISDEMEANOR":
+                     misdemeanorCount   =  misdemeanorCount    + 1
+
+                 elif crimedata.at[i,'LAW_CAT_CD'] == "VIOLATION":
+                     violationCount     =  violationCount      + 1
+
+                 else:
+                     print "ERROR : unknown crimne found", crimedata[i,'LAW_CAT_CD']
+             """
+     t = crimedata[crimedata['Lat_Lon'].isin(latLonStringList)].index.tolist()
+
+     felonyMask        = crimedata.loc[t, 'LAW_CAT_CD'] == "FELONY"
+     misdemeanorMask   = crimedata.loc[t, 'LAW_CAT_CD'] == "MISDEMEANOR"
+     violationMask     = crimedata.loc[t, 'LAW_CAT_CD'] == "VIOLATION"
+
+     felonyCount        =  np.sum(felonyMask)
+     misdemeanorCount   =  np.sum(misdemeanorMask)
+     violationCount     =  np.sum(violationMask)
+     
+
+     violationList.append    (violationCount)
+     misdemeanorList.append  (misdemeanorCount)
+     felonyList.append       (felonyCount)
+     latList.append          (lat1)
+     lonList.append          (lon1)
+
+     print "Crime Counts new function is ", violationCount, misdemeanorCount, felonyCount
          
 
          
@@ -188,12 +252,14 @@ if __name__ == "__main__":
     
 
     crimeDataLocation = "../data/CrimeData/RawData/nyc/NYPD_Complaint_Data_Historic.csv"
+    #crimeDataLocation = "../data/CrimeData/RawData/nyc/nypd_test.csv"
 
     crimedata = pd.read_csv(crimeDataLocation, nrows = 1000000)
+    #crimedata = pd.read_csv(crimeDataLocation)
 
     crimedata = crimedata.dropna(subset = ["Lat_Lon"])
 
-    numberOfDataPointsWanted = 70
+    numberOfDataPointsWanted = 1
 
     # Original lat start
     #latStart =  40.538266
@@ -327,7 +393,7 @@ if __name__ == "__main__":
     crimedataLatLonList = crimedata.Lat_Lon.tolist()
     
 
-    for lat, lon in locationsInNYC[:numberOfDataPointsWanted]:
+    for lat, lon in locationsInNYC:
    
         print "DataPoints count is ", dataPointsCount, "Remaining data points ", len(locationsInNYC) - dataPointsCount, "lat is ", lat, "lon is ", lon
 
@@ -367,7 +433,9 @@ if __name__ == "__main__":
  
         dataPointsCount = dataPointsCount + 1 
  
-        calculateDistance(lat, lon, crimedata, crimedataLatLonList)
+        #calculateDistance(lat, lon, crimedata, crimedataLatLonList)
+
+        calculateDistanceNew(lat, lon, crimedata, crimedataLatLonList)
 
         #print "Counts are ", alcoholCount, placesOfWorshipCount, shoppingCount, foodCount, publicPlacesCount, doctorCount, publicPlacesCount, policeStationCount, universityCount, schoolCount, bankCount, nightClubCount
 
