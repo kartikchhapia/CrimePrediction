@@ -2,19 +2,43 @@ import urllib, json
 from geopy.distance import great_circle
 import pandas as pd
 import numpy as np
+from geopy.geocoders import Nominatim
+import simplejson
+import CensusDataExtract.utils
+import cPickle as p
 
 
 
+googleMapRequestCount = 0
+invalidRequests = 0
 myKey = "AIzaSyAQODArFSeYSO-_S3F-OzyMggJNb5Xlwcc"
 myKeyNYCCheck = "AIzaSyBESs0RkTlQ8wNL2kQxkPkIuxsijbMpkA4"
-
-myKeyPlacesSearch = "AIzaSyBEDE6_l5mSwXns6Ra4_3k6dJIIj0KRGiU"
 
 
 countiesNYC = ["Queens", "Manhattan", "Staten Island", "Bronx", "Brooklyn", "Queens County", "New York"]
 
 
+googlePlacesAPIKeyList = ["AIzaSyDoFqsEcIOCxSWGsBHS3aq1oC8eI4E_ut0", "AIzaSyAaLzdBOfqxhCQM7gE5dFVWFL4rbEkb7NM", "AIzaSyCMwA6hkSzcUXeoerGoTCjSk0c8mjFss3k", "AIzaSyDbhIuTzVJ6CzpEiNF6Vwa2PL3n7b8kbkY"]
+
+keyIndex = 0
+
+
+def locationInNYC(lat, lon):
+    inNYC = False
+    geolocator = Nominatim()
+    lat_lon = str(lat) + ", "+str(lon)
+    location = geolocator.reverse(lat_lon)
+
+    if "NYC, New York," in location.address:
+        inNYC = True
+
+    return inNYC
+    
+    
+
+
 def storeNYCLocations(latStart, latEnd, lonStart, lonEnd, incrementFactorLat, incrementFactorLon):
+    breakCoordinatesLoopAfter = 320
     locationsInNYC = list()
     countLocationsInNYC = 0
     countLocationsOutsideNYC = 0
@@ -24,27 +48,15 @@ def storeNYCLocations(latStart, latEnd, lonStart, lonEnd, incrementFactorLat, in
     while (lon <= lonEnd):
         lat = latStart
         while (lat <= latEnd):
-            if (totalCount % 50 == 0):
-               print "Count is ", totalCount
-            latlong = str(lat)+","+str(lon)
-            Myurl = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+latlong+"&key="+myKeyNYCCheck
-            response = urllib.urlopen(Myurl)
-            jsonRaw = response.read()
-            jsonData = json.loads(jsonRaw)
-            results = jsonData["results"]
-            localityinNYC = False
-            for result in results:
-                #print "formatted address is ", result["formatted_address"]
-                for county in countiesNYC:
-                   if county + ", NY" in result["formatted_address"]:
-                      localityinNYC = True
-                      break
+            if (totalCount % 10 == 0):
+               print "Locations stored: ", totalCount
+            #localityinNYC = locationInNYC(lat, lon)
+            localityinNYC = CensusDataExtract.utils.is_inside_county(lat, lon)
             if localityinNYC == False:
-                print "Location not in NYC Latitude is ", lat, "Longtitude is ", lon
+
                 countLocationsOutsideNYC = countLocationsOutsideNYC + 1
-                for result in results:
-                    print "formatted address is ", result["formatted_address"]
-            else:
+            else: 
+                #print "Inside NYC"
                 locationsInNYC.append((lat,lon))
                 countLocationsInNYC = countLocationsInNYC + 1
                 
@@ -52,19 +64,36 @@ def storeNYCLocations(latStart, latEnd, lonStart, lonEnd, incrementFactorLat, in
             lat = lat + incrementFactorLat
             totalCount = totalCount + 1
         lon = lon + incrementFactorLon
-        print "Lon is ", lon
         
     print "Count of locations inside NYC is ",  countLocationsInNYC
     print "Count of locations outside NYC is ", countLocationsOutsideNYC
     return locationsInNYC 
 
 
+
 def placeSearch(lat, lon, myType, radius):
+     global googleMapRequestCount
+     global keyIndex
+     global invalidRequests
+     googleMapRequestCount = googleMapRequestCount + 1
      locationString = str(lat)+","+str(lon)
+     if googleMapRequestCount > 2300:
+         googleMapRequestCount = 0
+         keyIndex = keyIndex + 1
+     
+     myKeyPlacesSearch = googlePlacesAPIKeyList[keyIndex]    
+     myKeyPlacesSearch =  "AIzaSyABH8UM3ZQavmkuxkPrm9Vy19M3qllwZSI" 
      myUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+locationString+"&radius="+str(radius)+"&types="+myType+"&sensor=false&key="+myKeyPlacesSearch
      response = urllib.urlopen(myUrl)
      jsonRaw = response.read()
      jsonData = json.loads(jsonRaw)
+     #print "json Data is ", jsonData
+
+     if "expired" in jsonData["status"].lower() or "api" in jsonData["status"].lower():
+         print "Error, we have a query that is expired"
+         invalidRequests = invalidRequests + 1
+
+
      return jsonData
     
 
@@ -106,15 +135,15 @@ def calculateDistance(lat1, lon1, crimedata, crimedataLatLonList):
          latlontuple1 = (lat1, lon1)
          latlontuple2 = (lat2, lon2)
 
-         print "l1, l2 is ", latlontuple1, latlontuple2
+         #print "l1, l2 is ", latlontuple1, latlontuple2
          
          distanceBetweenPoints = (great_circle(latlontuple1, latlontuple2).meters)
-         print "Distance is ", distanceBetweenPoints , " between coordinates ", lat1, lon1, lat2, lon2
+         #print "Distance is ", distanceBetweenPoints , " between coordinates ", lat1, lon1, lat2, lon2
          if distanceBetweenPoints < distanceProximity:
              latlonstring = "(" + lat2+","+lon2+")"
              indexList =  crimedata.Lat_Lon[crimedata.Lat_Lon == latlonstring].index.tolist()
              
-             print "CLOSE ", lat1, lon1, lat2, lon2
+             #print "CLOSE ", lat1, lon1, lat2, lon2
              for i in indexList:
                  if crimedata.at[i,'LAW_CAT_CD'] == "FELONY":
                      felonyCount        =  felonyCount         + 1
@@ -151,12 +180,10 @@ def getLatLonFromString(lat_lon_string):
      return lat, lon
 
          
-   
     
 
 if __name__ == "__main__":
-
-
+    
 
     crimeDataLocation = "../data/CrimeData/RawData/nyc/NYPD_Complaint_Data_Historic.csv"
 
@@ -164,7 +191,7 @@ if __name__ == "__main__":
 
     crimedata = crimedata.dropna(subset = ["Lat_Lon"])
 
-    numberOfDataPointsWanted = 20
+    numberOfDataPointsWanted = 70
 
     latStart =  40.538266
     latEnd   =  40.924345 
@@ -172,12 +199,17 @@ if __name__ == "__main__":
     lonStart =  -74.268462
     lonEnd   =  -73.683440
     
-    divideRegions = 10
+    divideRegions = 100
     
     incrementFactorLat = (latEnd - latStart)/divideRegions
     incrementFactorLon = (lonEnd - lonStart)/divideRegions
+
+
+    print "Increment lat is ", incrementFactorLat
+    print "Incrememtn Factor lon is ", incrementFactorLon
     
-    distanceProximity = 800
+    # For crimes and landmarks
+    distanceProximity = 500
 
     # Not using these landmarks 
     landmarks                = ["accounting",  "beauty_salon", "car_dealer", "car_rental", "car_repair", "car_wash", "cemetery","electrician", "embassy", "fire_station", "florist", "funeral_home", "hair_care", "insurance_agency", "laundry", "lawyer", "locksmith", "lodging","movie_rental", "moving_company", "painter","plumber",  "real_estate_agency", "roofing_contractor", "storage",  "travel_agency",  "spa", ]
@@ -251,11 +283,16 @@ if __name__ == "__main__":
 
 
     locationsInNYC = storeNYCLocations(latStart, latEnd, lonStart, lonEnd, incrementFactorLat, incrementFactorLon)
+    #print "locations in NYC", locationInNYC
 
 
-
-
-
+    f = open('locationsInNYC.txt', 'w')
+    simplejson.dump(locationsInNYC, f)
+    f.close()
+    p.dump(locationsInNYC, open('list.p', 'wb'))
+    """
+    
+    
 
     #for lat, lon in locationsInNYC:
 
@@ -316,6 +353,8 @@ if __name__ == "__main__":
  
         calculateDistance(lat, lon, crimedata, crimedataLatLonList)
 
+        print "Counts are ", alcoholCount, placesOfWorshipCount, shoppingCount, foodCount, publicPlacesCount, doctorCount, publicPlacesCount, policeStationCount, universityCount, schoolCount, bankCount, nightClubCount
+
 
 
 
@@ -347,4 +386,6 @@ if __name__ == "__main__":
                        
     df = pd.DataFrame.from_items(data)
     df.to_csv("../data/TestDataSet/test.csv", sep = ",")
-
+    print "Total Google Map requests is ", googleMapRequestCount
+    print "Total invalid query requests is ", invalidRequests
+    """

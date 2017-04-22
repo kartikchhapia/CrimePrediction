@@ -7,7 +7,7 @@ def get_geo_id(lat, long):
     """
     Returns the GEO_ID aka FIPS code of the point given by a latitude and longitude.
     :param lat: Latutude of the point 
-    :param long: Longitude of the point
+    :param long: Longitude of the poin
     :return: FIPS code or GEO_ID of the point
     """
     res = requests.get(CENSUS_BLOCK_CONV_URL.format(lat, long))
@@ -45,8 +45,16 @@ def geo_id_to_cenrep_geo_id(geo_id):
     return '14000US{}'.format(geo_id)
 
 
-def is_inside_county(lat, long, counties=COUNTY_CODES):
-    geo_id = get_geo_id(lat, long)
+def is_inside_county(lat, lon):
+    counties = {
+    'new_york': '061',
+    'richmond': '085',
+    'bronx': '005',
+    'kings': '047',
+    'queens': '081'
+    }
+
+    geo_id = get_geo_id(lat, lon)
     county_id = str(geo_id[2:5])
     is_inside = False
     for k, v in counties.items():
