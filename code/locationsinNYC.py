@@ -200,7 +200,8 @@ if __name__ == "__main__":
     numberOfDataPointsWanted = 70
 
     latStart =  40.538266
-    latEnd   =  40.66953285999991 # My latend 40.67339364999991
+    latEnd   =  40.66953285999991
+    # My latend 40.67339364999991
     # [40.538266, 40.54212679, 40.545987579999995, 40.54984836999999, 40.55370915999999, 40.55756994999999,
     #  40.561430739999984, 40.56529152999998, 40.56915231999998, 40.57301310999998, 40.576873899999974, 40.58073468999997,
     #  40.58459547999997, 40.588456269999966, 40.592317059999964, 40.59617784999996, 40.60003863999996,
@@ -214,7 +215,7 @@ if __name__ == "__main__":
     
     divideRegions = 100
     
-    incrementFactorLat = (40.924345  - latStart)/divideRegions
+    incrementFactorLat = (40.924345  - 40.538266)/divideRegions
     incrementFactorLon = (lonEnd - lonStart)/divideRegions
 
 
@@ -302,7 +303,7 @@ if __name__ == "__main__":
     # f.close()
     # p.dump(locationsInNYC, open('list_aju.p', 'wb'))
 
-    locationsInNYC = p.load(open('list_aju.p', 'rb'))
+    locationsInNYC = p.load(open('list_dumps/list_aju.p', 'rb'))
     validPoints = []
 
     for lat, lon in locationsInNYC:
@@ -312,7 +313,7 @@ if __name__ == "__main__":
     print 'valid',len(validPoints)
 
     locationsInNYC = validPoints
-
+    locationsInNYC = locationsInNYC[2344:]
     
 
     #for lat, lon in locationsInNYC:
