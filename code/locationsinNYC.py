@@ -300,9 +300,9 @@ if __name__ == "__main__":
     # f = open('locationsInNYC.txt', 'w')
     # simplejson.dump(locationsInNYC, f)
     # f.close()
-    # p.dump(locationsInNYC, open('listaju.p', 'wb'))
+    # p.dump(locationsInNYC, open('list_aju.p', 'wb'))
 
-    locationsInNYC = p.load(open('listaju.p', 'rb'))
+    locationsInNYC = p.load(open('list_aju.p', 'rb'))
     validPoints = []
 
     for lat, lon in locationsInNYC:
