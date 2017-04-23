@@ -101,3 +101,6 @@ ENV/
 
 # Pycharm files
 .idea
+
+# Large datasets
+data/CrimeData/RawData/nyc/

@@ -77,12 +77,9 @@ def placeSearch(lat, lon, myType, radius):
      global invalidRequests
      googleMapRequestCount = googleMapRequestCount + 1
      locationString = str(lat)+","+str(lon)
-     if googleMapRequestCount > 2300:
-         googleMapRequestCount = 0
-         keyIndex = keyIndex + 1
      
      myKeyPlacesSearch = googlePlacesAPIKeyList[keyIndex]    
-     myKeyPlacesSearch =  "AIzaSyABH8UM3ZQavmkuxkPrm9Vy19M3qllwZSI" 
+     myKeyPlacesSearch =  "AIzaSyDUkE6BMgSiVgcpbIS9ztF8wVHDAZKlZZ8"
      myUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+locationString+"&radius="+str(radius)+"&types="+myType+"&sensor=false&key="+myKeyPlacesSearch
      response = urllib.urlopen(myUrl)
      jsonRaw = response.read()
@@ -180,7 +177,16 @@ def getLatLonFromString(lat_lon_string):
      return lat, lon
 
          
-    
+def shouldExcludePoint(lat, lon):
+    exrange = [[(40.579238, -74.074139), (40.515844, -74.003414)],
+               [(40.566853, -74.087647), (40.543207, -73.942519)],
+               [(40.626113, -73.883327), (40.602910, -73858269)]]
+    if lat <= exrange[0][0][0] and lat >= exrange[0][1][0] and lon >= exrange[0][0][1] and lon <= exrange[0][1][1]:
+        return True
+    if lat <= exrange[1][0][0] and lat >= exrange[1][1][0] and lon >= exrange[1][0][1] and lon <= exrange[1][1][1]:
+        return True
+    if lat <= exrange[2][0][0] and lat >= exrange[2][1][0] and lon >= exrange[2][0][1] and lon <= exrange[2][1][1]:
+        return True
 
 if __name__ == "__main__":
     
@@ -194,14 +200,21 @@ if __name__ == "__main__":
     numberOfDataPointsWanted = 70
 
     latStart =  40.538266
-    latEnd   =  40.924345 
-    
+    latEnd   =  40.66953285999991 # My latend 40.67339364999991
+    # [40.538266, 40.54212679, 40.545987579999995, 40.54984836999999, 40.55370915999999, 40.55756994999999,
+    #  40.561430739999984, 40.56529152999998, 40.56915231999998, 40.57301310999998, 40.576873899999974, 40.58073468999997,
+    #  40.58459547999997, 40.588456269999966, 40.592317059999964, 40.59617784999996, 40.60003863999996,
+    #  40.603899429999956, 40.60776021999995, 40.61162100999995, 40.61548179999995, 40.619342589999945, 40.62320337999994,
+    #  40.62706416999994, 40.63092495999994, 40.634785749999935, 40.63864653999993, 40.64250732999993, 40.64636811999993,
+    #  40.650228909999925, 40.65408969999992, 40.65795048999992, 40.66181127999992, 40.665672069999914, 40.66953285999991]
+    #Mylist
+
     lonStart =  -74.268462
     lonEnd   =  -73.683440
     
     divideRegions = 100
     
-    incrementFactorLat = (latEnd - latStart)/divideRegions
+    incrementFactorLat = (40.924345  - latStart)/divideRegions
     incrementFactorLon = (lonEnd - lonStart)/divideRegions
 
 
@@ -235,11 +248,9 @@ if __name__ == "__main__":
     universityLandmarks      = ["university"]
 
     schoolLandmarks          = ["school"]
-
     bankLandmarks            = ["atm", "bank"]
 
     nightClublandmarks       = ["night_club"]
-
 
 
     alcoholCount         = 0
@@ -282,16 +293,26 @@ if __name__ == "__main__":
 
 
 
-    locationsInNYC = storeNYCLocations(latStart, latEnd, lonStart, lonEnd, incrementFactorLat, incrementFactorLon)
+    # locationsInNYC = storeNYCLocations(latStart, latEnd, lonStart, lonEnd, incrementFactorLat, incrementFactorLon)
     #print "locations in NYC", locationInNYC
 
 
-    f = open('locationsInNYC.txt', 'w')
-    simplejson.dump(locationsInNYC, f)
-    f.close()
-    p.dump(locationsInNYC, open('list.p', 'wb'))
-    """
-    
+    # f = open('locationsInNYC.txt', 'w')
+    # simplejson.dump(locationsInNYC, f)
+    # f.close()
+    # p.dump(locationsInNYC, open('listaju.p', 'wb'))
+
+    locationsInNYC = p.load(open('listaju.p', 'rb'))
+    validPoints = []
+
+    for lat, lon in locationsInNYC:
+        if not shouldExcludePoint(lat, lon):
+            validPoints.append((lat, lon))
+    print 'total',len(locationsInNYC)
+    print 'valid',len(validPoints)
+
+    locationsInNYC = validPoints
+
     
 
     #for lat, lon in locationsInNYC:
@@ -311,7 +332,7 @@ if __name__ == "__main__":
     crimedataLatLonList = crimedata.Lat_Lon.tolist()
     
 
-    for lat, lon in locationsInNYC[:numberOfDataPointsWanted]:
+    for lat, lon in locationsInNYC:
    
         print "DataPoints count is ", dataPointsCount, "Remaining data points ", len(locationsInNYC) - dataPointsCount, "lat is ", lat, "lon is ", lon
 
@@ -344,28 +365,22 @@ if __name__ == "__main__":
         doctorCountList.append          (doctorCount)          
         publicPlacesCountList.append    (publicPlacesCount)    
         policeStationCountList.append   (policeStationCount)   
-        universityCountList.append      (universityCount)      
+        universityCountList.append      (universityCount)
         schoolCountList.append          (schoolCount)          
         bankCountList.append            (bankCount)            
         nightClubCountList.append       (nightClubCount) 
  
         dataPointsCount = dataPointsCount + 1 
  
-        calculateDistance(lat, lon, crimedata, crimedataLatLonList)
+        # calculateDistance(lat, lon, crimedata, crimedataLatLonList)
 
         print "Counts are ", alcoholCount, placesOfWorshipCount, shoppingCount, foodCount, publicPlacesCount, doctorCount, publicPlacesCount, policeStationCount, universityCount, schoolCount, bankCount, nightClubCount
 
 
-
-
-
-
-
-
-    data =    [        (  "Latitude "               , latitudeList),
+        data =    [        (  "Latitude "               , latitudeList),
                        (  "Longitude"               , longitudeList),
-                       (  "Lat"                     , latList),
-                       (  "Lon"                     , lonList),
+                       # (  "Lat"                     , latList),
+                       # (  "Lon"                     , lonList),
                        (  "City"                    , cityList),
                        (  "Alcohol Places"          , alcoholCountList),
                        (  "Places of Worship"       , placesOfWorshipCountList),
@@ -379,13 +394,15 @@ if __name__ == "__main__":
                        (  "Schools "                , schoolCountList),
                        (  "Banks"                   , bankCountList),
                        (  "Night Clubs"             , nightClubCountList),
-                       (  "VIOLATION CRIMES"        , violationList),
-                       (  "FELONY CRIMES"           , felonyList),
-                       (  "MISDEMEANOR CRIMES"      , misdemeanorList),
+                       # (  "VIOLATION CRIMES"        , violationList),
+                       # (  "FELONY CRIMES"           , felonyList),
+                       # (  "MISDEMEANOR CRIMES"      , misdemeanorList),
               ]
                        
-    df = pd.DataFrame.from_items(data)
-    df.to_csv("../data/TestDataSet/test.csv", sep = ",")
+        df = pd.DataFrame.from_items(data)
+        df.to_csv("../data/TestDataSet/test_aju.csv", sep = ",")
+        p.dump(df, open('df.p', 'wb'))
+
     print "Total Google Map requests is ", googleMapRequestCount
     print "Total invalid query requests is ", invalidRequests
-    """
+
