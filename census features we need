@@ -1,0 +1,85 @@
+Census Features:
+
+Total population
+Mean / median age of population
+
+demographic:
+	white
+	black
+	asian
+	hispanic/ latino
+Sex:
+	M/F ratio total
+	M/F ratio by age groups
+marital status:
+	Males
+		% married
+		% separated
+		% divorced
+	Females
+		% married
+		% separated
+		% divorced	
+Home occupation:
+	% houses occupied
+	% vacant
+	% on mortage
+	% owned fully
+	% rented
+Origin:
+	Same state
+	Different state
+	Region of origin: Continent
+Citizenship status:
+	% foreign born
+	% native
+	% Naturalized
+Family:
+	Avg family size
+	Avg household size
+	% with children
+	% single parents
+Fertility:
+	per 1000 women 15-50
+	per 1000 unmarried women
+Computer usage:
+	how many households have computer
+	how many households have broadband
+Employment:
+	Population 16 years and over
+	Civilian labor unemployment rate
+Occupation:
+	Management, business, science, and arts occupations
+	Service occupations
+	Sales and office occupations
+	Natural resources, construction, and maintenance occupations
+	Production, transportation, and material moving occupations
+Industry:
+	Agriculture, forestry, fishing and hunting, and mining
+	Construction
+	Manufacturing
+	Wholesale trade
+	Retail trade
+	Transportation and warehousing, and utilities
+	Information
+	Finance and insurance, and real estate and rental and leasing
+	Professional, scientific, and management, and administrative and waste management services
+	Educational services, and health care and social assistance
+	Arts, entertainment, and recreation, and accommodation and food services
+	Other services, except public administration
+	Public administration
+Class of workers:
+	Private wage and salary workers
+	Government workers
+	Self-employed in own not incorporated business workers
+	Unpaid family workers
+Income:
+	Median household income (dollars)
+	Mean household income (dollars)
+	Median family income (dollars)
+	Mean family income (dollars)
+	per capita income
+Health insurance:
+	% with health insurance
+
+
