@@ -2,6 +2,7 @@ import numpy as np
 import csv
 import extract_data
 import cPickle as p
+from numpy import genfromtxt
 
 def get_census_csv(pointList):
     """
@@ -20,7 +21,7 @@ def get_census_csv(pointList):
 
     valList = map(lambda x : x.values(), dictList)
     valList = np.array(valList)
-    with open('censusListAnish.csv', 'wb') as f:
+    with open('censusList0.csv', 'wb') as f:
         writer = csv.writer(f)
         writer.writerows(valList)
     print 'writing done'
@@ -28,5 +29,6 @@ def get_census_csv(pointList):
 
 
 if __name__ == '__main__':
-    locationsInNYC = p.load(open('../list_dumps/list_Anish.p', 'rb'))
+    myData = genfromtxt('../../data/TestDataSet/crimedata.csv', delimiter=',')
+    locationsInNYC = myData[1:530,1:3] #531 : all
     data = get_census_csv(locationsInNYC)
