@@ -1,5 +1,6 @@
 import json
 import requests
+import grequests
 from config import CENSUS_BLOCK_CONV_URL, COUNTY_CODES
 
 
@@ -13,6 +14,11 @@ def get_geo_id(lat, long):
     res = requests.get(CENSUS_BLOCK_CONV_URL.format(lat, long))
     return res.json()['Block']['FIPS'][:11]
 
+
+def get_geo_id_async(coords):
+    reqs = (grequests.get(CENSUS_BLOCK_CONV_URL.format(lat, lon)) for lat, lon in coords)
+    responses = grequests.map(reqs)
+    return [res.json()['Block']['FIPS'][:11] for res in responses]
 
 def jsonp_res_to_obj(jsonp_res):
     """

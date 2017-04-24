@@ -1,5 +1,5 @@
 # Wait this amount in seconds before each request
-THROTTLE = 0.4
+THROTTLE = 0.1
 
 # Manhattan, Bronx, Brooklyn, Queens, Richmond county
 
