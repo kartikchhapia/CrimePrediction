@@ -9,10 +9,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_absolute_error
 import matplotlib.pyplot as plt
-import numpy as np
 from sklearn import ensemble
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Lasso
+import numpy as np
 
 
 
@@ -33,9 +33,6 @@ allDataLandmarks = allData.iloc[:, 7:19]
 violationGoldStandard    =  allData.iloc[:, 3:4]
 felonyGoldStandard       =  allData.iloc[:, 4:5]
 misdemeanorGoldStandard  =  allData.iloc[:, 5:6]
-
-# The predictor we want to predict
-preditionColumn = misdemeanorGoldStandard
 
 
 allData['sum'] = allData["FELONY CRIMES"] + allData["MISDEMEANOR CRIMES"] + allData["VIOLATION CRIMES"]
@@ -155,7 +152,6 @@ plt.figure(figsize=(4,2))
 plt.bar(y_pos, performance, align='center', alpha=0.5, color = 'r')
 plt.xticks(y_pos, objects)
 plt.ylabel('Mean Absolute Error')
-plt.title('Programming language usage')
  
 plt.show()
 
