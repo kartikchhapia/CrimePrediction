@@ -1,0 +1,18 @@
+Modelling:
+	Problem formulation
+	Regression vs classificatiom
+	choosing models : Linear, Ensemble, Non linear
+	Feature importances
+	why no Dimensionality reduction < High interpretability
+
+
+Import data:
+	Feature Selection: Lasso select from model   
+For i in [X_full,X_extracted, X_reduced]
+	For i in [X_full, X_census, X_ landmark]:
+		Linear
+		RF
+		GBT
+		NN
+		SVM
+

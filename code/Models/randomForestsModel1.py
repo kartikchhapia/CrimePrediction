@@ -12,14 +12,12 @@ from prepareData import lassoFS
 
 #%%
 X,y,colNames = get_data()
-X_train,X_test,y_train,y_test = model_selection.train_test_split(X,y,test_size=0.3,random_state=0)
+X_train,X_test,y_train,y_test = model_selection.train_test_split(X,y,test_size=0.3,random_state=100)
 X_train,X_test,colNames = lassoFS(X_train,y_train,X_test,y_test,colNames)
 
 #%%
-reg = ensemble.RandomForestRegressor(n_estimators=500,random_state=0)
-#param_grid = {'max_depth':[8,9,10,11,12,13,14],'max_features':[5,10,20,40,80,100]}
-param_grid = {'max_depth':[12],'max_features':[40]}
-
+reg = ensemble.RandomForestRegressor(n_estimators=500,random_state=0) #changeable
+param_grid = {'max_depth':[8,9,10,11,12,13,14],'max_features':[5,10,20,40,80,100]} #adjustible
 gscv = model_selection.GridSearchCV(reg, param_grid, scoring=None,fit_params=None, 
                              refit=True, cv=3, verbose=2,
                              return_train_score=True)

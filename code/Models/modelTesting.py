@@ -31,7 +31,7 @@ X_train,X_test,colNames = lassoFS(X_train,y_train,X_test,y_test,colNames)
 #                           nesterovs_momentum=True)
 #
 #
-#param_grid = {'alpha':[0.001,0.01,0.001],'hidden_layer_sizes':[10,20,30,40,50,60,80,100],'activation':['logistic'],'solver':['lbfgs']}
+#param_grid = {'alpha':[0.001,0.001],'hidden_layer_sizes':[40,50,60],'activation':['logistic'],'solver':['lbfgs']}
 #gscv = model_selection.GridSearchCV(reg, param_grid, scoring=None,fit_params=None, 
 #                             refit=True, cv=3, verbose=2,
 #                             return_train_score=True)
@@ -66,7 +66,7 @@ X_train,X_test,colNames = lassoFS(X_train,y_train,X_test,y_test,colNames)
 
 #%% SVM + grid search
 #reg = svm.SVR()
-#param_grid = {'C': [10000,20000,50000,100000],
+#param_grid = {'C': [1000,10000,20000,50000],
 #              'epsilon': [0.1],
 #              'gamma': np.exp2(range(-10,-6)),
 #                              }
@@ -86,11 +86,11 @@ X_train,X_test,colNames = lassoFS(X_train,y_train,X_test,y_test,colNames)
 #                             refit=True, cv=3, verbose=2,
 #                             return_train_score=True)
 #%% Lasso
-reg = linear_model.LinearRegression(fit_intercept=True, normalize=False, copy_X=True, n_jobs=1)
-param_grid = {}
-gscv = model_selection.GridSearchCV(reg, param_grid, scoring=None,fit_params=None, 
-                             refit=True, cv=3, verbose=2,
-                             return_train_score=True)
+#reg = linear_model.LinearRegression(fit_intercept=True, normalize=False, copy_X=True, n_jobs=1)
+#param_grid = {}
+#gscv = model_selection.GridSearchCV(reg, param_grid, scoring=None,fit_params=None, 
+#                             refit=True, cv=3, verbose=2,
+#                             return_train_score=True)
 
 #%%
 gscv.fit(X_train,y_train)
