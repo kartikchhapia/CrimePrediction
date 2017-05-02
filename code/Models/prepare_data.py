@@ -11,7 +11,7 @@ from scipy.stats import randint as sp_randint
 from sklearn import svm
 
 
-def get_data():
+def get_cleaned_data():
     df = pd.read_csv('../../data/TestDataSet/crime_landmarks_census.csv', index_col=0)
     df = df[df.total_population != 0]
     df = df[df.hous_units != 0]
@@ -132,6 +132,6 @@ def add_features(x, col_names):
 #%%
 
 if __name__ == '__main__':
-    x, y, col_names = get_data()
+    x, y, col_names = get_cleaned_data()
     x_train, x_test, y_train, y_test = model_selection.train_test_split(x, y, test_size=0.3, random_state=0)
     x_train, x_test, col_names = lasso_fs(x_train, y_train, x_test, y_test, col_names)

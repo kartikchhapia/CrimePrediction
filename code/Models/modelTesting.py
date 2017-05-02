@@ -9,14 +9,14 @@ import math
 from sklearn.utils import shuffle
 from scipy.stats import randint as sp_randint
 from sklearn import svm
-from prepareData import get_data
-from prepareData import lassoFS
+from prepare_data import get_cleaned_data
+from prepare_data import lasso_fs
 
 #%%
 
-X,y,colNames = get_data()
+X,y,colNames = get_cleaned_data()
 X_train,X_test,y_train,y_test = model_selection.train_test_split(X,y,test_size=0.3,random_state=0)
-X_train,X_test,colNames = lassoFS(X_train,y_train,X_test,y_test,colNames)
+X_train,X_test,colNames = lasso_fs(X_train, y_train, X_test, y_test, colNames)
 
 #%% Neural net + grid serach
 #reg = neural_network.MLPRegressor(hidden_layer_sizes=(50, ), 

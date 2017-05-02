@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import mean_absolute_error
 import config
 
+
 def get_census_train_test_data():
     df = pd.read_csv('../../data/TestDataSet/crime_landmarks_census.csv', index_col=0)
     df = df.sample(frac=1).reset_index(drop=True)  # Shuffle
