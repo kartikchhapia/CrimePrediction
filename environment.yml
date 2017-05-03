@@ -52,6 +52,9 @@ dependencies:
 - zlib=1.2.8=3
 - pip:
   - geopy==1.11.0
+  - gevent==1.2.1
+  - greenlet==0.4.12
+  - grequests==0.3.0
   - httpie==0.9.9
   - pygments==2.2.0
 prefix: /home/aju/miniconda3/envs/mlproj
