@@ -1,3 +1,4 @@
+import pickle
 from sklearn import neural_network
 import pandas as pd
 import numpy as np
@@ -39,14 +40,71 @@ def get_cleaned_data():
     return x, y, col_names
 
 
-# %%
+def get_cleaned_landmarks_data():
+    df = pd.read_csv('../../data/TestDataSet/crime_landmarks_census.csv', index_col=0)
+    df = df[df.total_population != 0]
+    df = df[df.hous_units != 0]
+    dataset = df.values
+
+    # Delete Nan columns
+    col_names = np.array(df.columns).astype(str)
+    col_names = np.delete(col_names, [5, 23, 32])
+    col_names = col_names[5:]
+    col_names = col_names[:12] # remove all census data
+
+    # Delete Nan columns
+    dataset = np.delete(dataset, [5, 23, 32], 1)
+    label = dataset[:, 2:5]
+    y = map(lambda x: x[0]+x[1]+x[2], label)     # Add all three types of crime
+    x = dataset[:, 5:]
+    x = x[:, :12]
+    # Scale and shuffle
+    x, y = shuffle(x, y, random_state=0)
+    scaler = preprocessing.StandardScaler(copy=True, with_mean=True, with_std=True)
+    scaler.fit(x)
+    x = scaler.transform(x)
+
+    # Add features
+    # x, col_names = add_features(x, col_names)
+    return x, y, col_names
+
+
+def get_cleaned_census_data():
+    df = pd.read_csv('../../data/TestDataSet/crime_landmarks_census.csv', index_col=0)
+    df = df[df.total_population != 0]
+    df = df[df.hous_units != 0]
+    dataset = df.values
+
+    # Delete Nan columns
+    col_names = np.array(df.columns).astype(str)
+    col_names = np.delete(col_names, [5, 23, 32])
+    col_names = col_names[5:]
+
+    # Delete Nan columns
+    dataset = np.delete(dataset, [5, 23, 32], 1)
+    label = dataset[:, 2:5]
+    y = map(lambda x: x[0]+x[1]+x[2], label)     # Add all three types of crime
+    x = dataset[:, 5:]
+    # Scale and shuffle
+    x, y = shuffle(x, y, random_state=0)
+    scaler = preprocessing.StandardScaler(copy=True, with_mean=True, with_std=True)
+    scaler.fit(x)
+    x = scaler.transform(x)
+
+    # Add features
+    x, col_names = add_features(x, col_names)
+    col_names = col_names[12:]
+    x = x[:, 12:]
+    return x, y, col_names
+
+
 def lasso_fs(x_train, y_train, x_test, y_test, col_names):
     reg = linear_model.Lasso(alpha=1.0, fit_intercept=True, normalize=False, 
                        precompute=False, copy_X=True, max_iter=1000, 
                        random_state=0)
     param_grid = {'alpha' : range(10)}
     gscv = model_selection.GridSearchCV(reg, param_grid, scoring=None,fit_params=None,
-                                 refit=True, cv=3, verbose=2,
+                                 refit=True, cv=3, verbose=0,
                                  return_train_score=True)
     gscv.fit(x_train, y_train)
     reg = gscv.best_estimator_
@@ -56,11 +114,8 @@ def lasso_fs(x_train, y_train, x_test, y_test, col_names):
     col_names = np.delete(col_names, bad_features)
     print(str(len(col_names)) + ' features preserved')
     return x_train, x_test, col_names
-    
-#%%
 
-                                            
-#%% Helpers
+
 def add_features(x, col_names):
     
     new_cols = [
@@ -129,9 +184,37 @@ def add_features(x, col_names):
     x = scaler.transform(x)
     return x, col_names
 
-#%%
 
-if __name__ == '__main__':
+def calc_feat_importances():
     x, y, col_names = get_cleaned_data()
     x_train, x_test, y_train, y_test = model_selection.train_test_split(x, y, test_size=0.3, random_state=0)
     x_train, x_test, col_names = lasso_fs(x_train, y_train, x_test, y_test, col_names)
+    lrfi = pickle.load(open("featimp/lr_featimps.p", "rb"))
+    gbtfi = pickle.load(open("featimp/gbt_featimps.p", "rb"))
+    rffi= pickle.load(open("featimp/rf_featimps.p", "rb"))
+    a = 0
+    fis = np.vstack([col_names, lrfi, gbtfi, rffi])
+
+    fis_lr = sorted(np.transpose(fis), key=lambda x: -float(x[1]))
+    np.savetxt('featimp/featimps_lr.txt', fis_lr, delimiter=',', fmt="%s")
+
+    fis_gbt = sorted(np.transpose(fis), key=lambda x: -float(x[2]))
+    np.savetxt('featimp/featimps_gbt.txt', fis_gbt, delimiter=',', fmt="%s")
+
+    fis_rf = sorted(np.transpose(fis), key=lambda x: -float(x[3]))
+    np.savetxt('featimp/featimps_rf.txt', fis_rf, delimiter=',', fmt="%s")
+
+    fis_lr = fis_lr[:3]
+    fis_gbt = fis_gbt[:15]
+    fis_rf = fis_rf[:15]
+
+    fis_stacked = np.vstack([fis_lr, fis_gbt, fis_rf])
+    fis_uniq = np.vstack({tuple(row) for row in fis_stacked})
+    np.savetxt('featimp/featimps_uniq.txt', fis_uniq, delimiter=',', fmt="%s")
+
+
+if __name__ == '__main__':
+    calc_feat_importances()
+    # x, y, col_names = get_cleaned_data()
+    # x_train, x_test, y_train, y_test = model_selection.train_test_split(x, y, test_size=0.3, random_state=0)
+    # x_train, x_test, col_names = lasso_fs(x_train, y_train, x_test, y_test, col_names)
